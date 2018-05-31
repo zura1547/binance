@@ -5,7 +5,7 @@ const sinon = require('sinon');
 
 mock('request', mockRequest);
 
-const binanceApi = require('../lib/binance.js');
+const binanceApi = require('../');
 const BinanceRest = binanceApi.BinanceRest;
 
 describe('BinanceRest', () => {
