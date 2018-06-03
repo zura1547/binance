@@ -1,7 +1,2 @@
 .vscode/
-.idea/
 node_modules/
-util/config.js
-coverage/
-test.js
-.gitignore
