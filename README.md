@@ -55,8 +55,8 @@ binanceRest.allOrders('BNBBTC', (err, data) => {
  * WebSocket API
  *
  * Each call to onXXXX initiates a new websocket for the specified route, and calls your callback with
- * the payload of each message received.  Each call to onXXXX returns the instance of the websocket
- * client if you want direct access(https://www.npmjs.com/package/ws).
+ * the payload of each message received.  Each call to onXXXX returns the instance of the Stream.
+ * then Stream instance can be used to restart(renew) | close connection, delete instance from streams list and etc... 
  */
 const binanceWS = new api.BinanceWS(true); // Argument specifies whether the responses should be beautified, defaults to true
 
@@ -110,8 +110,8 @@ binanceWS.onCombinedStream([
 binanceWS.onUserData(binanceRest, (data) => {
         console.log(data);
     }, 60000) // Optional, how often the keep alive should be sent in milliseconds
-    .then((ws) => {
-        // websocket instance available here
+    .then((stream) => {
+		
     });
 ```
 

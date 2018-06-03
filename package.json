@@ -1,8 +1,8 @@
 {
   "name": "binance",
-  "version": "1.3.3",
+  "version": "1.4",
   "description": "node.js wrapper for the Binance REST and WebSocket APIs",
-  "main": "./lib/binance.js",
+  "main": "./index.js",
   "scripts": {
     "test": "mocha",
     "cover": "istanbul cover _mocha",

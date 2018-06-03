@@ -4,4 +4,4 @@ test/
 util/
 .vscode/
 .eslintrc.js
-.travis.yml 
+.travis.yml
