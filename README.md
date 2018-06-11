@@ -1,7 +1,3 @@
-![npm downloads](https://img.shields.io/npm/dt/binance.svg)
-![testing status](https://img.shields.io/travis/aarongarvey/binance.svg)
-![code coverage](https://img.shields.io/coveralls/github/aarongarvey/binance.svg)
-
 # Binance
 A wrapper for the Binance REST and WebSocket APIs.  Uses both promises and callbacks, and beautifies the
 binance API responses that normally use lots of one letter property names. For more information on the API and parameters for requests visit https://github.com/binance-exchange/binance-official-api-docs
@@ -9,8 +5,8 @@ binance API responses that normally use lots of one letter property names. For m
 # Usage/Example
 
 ```js
-const api = require('binance');
-const binanceRest = new api.BinanceRest({
+const binance = require('binance');
+const binanceRest = new binance.Rest({
     key: 'api-key', // Get this from your account on binance.com
     secret: 'api-secret', // Same for this
     timeout: 15000, // Optional, defaults to 15000, is the request time out in milliseconds
@@ -53,67 +49,77 @@ binanceRest.allOrders('BNBBTC', (err, data) => {
 
 /*
  * WebSocket API
+ * 
+ * 
+ */
+ 
+const stream = new binance.Stream(
+	path = binance.types.trade('btcusdt'), // or just 'btcusdt@trade'
+); 
+
+stream.start();
+
+// you can listen to trade event as well
+stream.on('all', (data) => {
+	// use data here
+});
+
+// listen to close event to do proper cleanup or restart stream
+stream.on('close', () => {
+	stream.restart();
+});
+
+// to restart stream every hour( no data will be lost while restarting ): 
+setInterval(() => stream.restart(), 60000 * 60)
+
+/*
+ * Combined Stream
  *
- * Each call to onXXXX initiates a new websocket for the specified route, and calls your callback with
- * the payload of each message received.  Each call to onXXXX returns the instance of the Stream.
- * then Stream instance can be used to restart(renew) | close connection, delete instance from streams list and etc... 
+ * All the rules that apply to Stream, applies to CombinedStream as well, as CombinedStream is child class of Stream.
  */
-const binanceWS = new api.BinanceWS(true); // Argument specifies whether the responses should be beautified, defaults to true
-
-binanceWS.onDepthUpdate('BNBBTC', (data) => {
-    console.log(data);
-});
-
-binanceWS.onAggTrade('BNBBTC', (data) => {
-    console.log(data);
-});
-
-binanceWS.onKline('BNBBTC', '1m', (data) => {
-    console.log(data);
-});
-
-/*
- * You can use one websocket for multiple streams.  There are also helpers for the stream names, but the
- * documentation has all of the stream names should you want to specify them explicitly.
- */
-const streams = binanceWS.streams;
-
-binanceWS.onCombinedStream([
-        streams.depth('BNBBTC'),
-        streams.kline('BNBBTC', '5m'),
-        streams.trade('BNBBTC'),
-        streams.ticker('BNBBTC')
-    ],
-    (streamEvent) => {
-        switch(streamEvent.stream) {
-            case streams.depth('BNBBTC'):
-                console.log('Depth event, update order book\n', streamEvent.data);
-                break;
-            case streams.kline('BNBBTC', '5m'):
-                console.log('Kline event, update 5m candle display\n', streamEvent.data);
-                break;
-            case streams.trade('BNBBTC'):
-                console.log('Trade event, update trade history\n', streamEvent.data);
-                break;
-            case streams.ticker('BNBBTC'):
-                console.log('Ticker event, update market stats\n', streamEvent.data);
-                break;
-        }
-    }
+// 1) add paths at the beginning:
+const streams = binance.CombinedStream(
+	paths = ['btcusdt@trade', 'bnbusdt@kline_1m'], // you can specify paths here, or add later.
 );
+// you can still add paths later before you run it.
+streams.add_trade('bnbbtc');
+streams.add_kline('bnbbtc', '1m');
+
+streams.start();
+// after you can still add new paths, but you will have to restart.
+streams.add_aggTrade('ethbtc');
+streams.restart();
+
+
+// 2) add paths later
+const streams = binance.CombinedStream();
+
+streams.add_trade('btcusdt');
+streams.add_kline('btcusdt', '1m');
+
+streams.start();
+
 
 /*
- * onUserData requires an instance of BinanceRest in order to make the necessary startUserDataStream and
- * keepAliveUserDataStream calls.  The webSocket instance is returned by promise rather than directly
- * due to needing to request a listenKey from the server first.
+ * UserDataStream
+ *
+ * UserDataStream is another child class of Stream
+ * When userDataStream.restart() is called, it will not renew listenKey.
  */
-binanceWS.onUserData(binanceRest, (data) => {
-        console.log(data);
-    }, 60000) // Optional, how often the keep alive should be sent in milliseconds
-    .then((stream) => {
-		
-    });
-```
+const stream = binance.UserDataStream("your key here", "your secret here");
+stream.start();
+
+// 1) listen to both: executionReport and outboundAccountInfo
+stream.on('all' (e) => {
+    
+});
+// 2) listen seperately
+stream.on('executionReport' (e) => {
+
+})
+stream.on('outboundAccountInfo', (e) => {
+
+});
 
 # REST APIs
 
