@@ -2,6 +2,9 @@
 A wrapper for the Binance REST and WebSocket APIs.  Uses both promises and callbacks, and beautifies the
 binance API responses that normally use lots of one letter property names. For more information on the API and parameters for requests visit https://github.com/binance-exchange/binance-official-api-docs
 
+# Installation
+npm install zura1547/binance
+
 # Usage/Example
 
 ```js
