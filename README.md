@@ -10,22 +10,9 @@ npm install zura1547/binance
 ```js
 const binance = require('binance');
 const binanceRest = new binance.Rest(
-    key = 'api-key', // Get this from your account on binance.com
-    secret = 'api-secret', // Same for this
-    timeout = 15000, // Optional, defaults to 15000, is the request time out in milliseconds
-    recvWindow = 10000, // Optional, defaults to 5000, increase if you're getting timestamp errors
-    disableBeautification = false,
-    /*
-     * Optional, default is false. Binance's API returns objects with lots of one letter keys.  By
-     * default those keys will be replaced with more descriptive, longer ones.
-     */
-    handleDrift = false
-    /* Optional, default is false.  If turned on, the library will attempt to handle any drift of
-     * your clock on it's own.  If a request fails due to drift, it'll attempt a fix by requesting
-     * binance's server time, calculating the difference with your own clock, and then reattempting
-     * the request.
-     */
-});
+    key = 'api-key',
+    secret = 'api-secret'
+);
 
 // You can use promises
 binanceRest.allOrders({
@@ -52,10 +39,9 @@ binanceRest.allOrders('BNBBTC', (err, data) => {
 
 /*
  * WebSocket API
- * 
- * 
  */
- 
+
+// to create stream path: binance.types.<streamType>(args)
 const stream = new binance.Stream(
 	path = binance.types.trade('btcusdt'), // or just 'btcusdt@trade'
 ); 
@@ -72,7 +58,7 @@ stream.on('close', () => {
 	stream.restart();
 });
 
-// to restart stream every hour( no data will be lost while restarting ): 
+// to restart stream every hour( no data will be lost while restarting ) 
 setInterval(() => stream.restart(), 60000 * 60)
 
 /*
@@ -102,14 +88,27 @@ streams.add_kline('btcusdt', '1m');
 
 streams.start();
 
+// then you can listen to events
+streams.on('trade', (e) => {
+    // every symbols trade event will execute this function
+    // to check specific symbol
+    if(e.symbol == 'bnbbtc'){
+
+    }
+    else if(e.symbol == 'btcusdt'){
+
+    }
+});
 
 /*
  * UserDataStream
  *
- * UserDataStream is another child class of Stream
+ * UserDataStream is another child class of Stream.
+ * binance.Rest instance is required for UserDataStream
  * When userDataStream.restart() is called, it will not renew listenKey.
  */
-const stream = binance.UserDataStream("your key here", "your secret here");
+var rest = binance.Rest("your api key here", "your api secret here");
+var stream = binance.UserDataStream(rest);
 stream.start();
 
 // 1) listen to both: executionReport and outboundAccountInfo
