@@ -469,53 +469,6 @@ Beautified Response
     trades: 283057
 }
 ```
-
-### **onCombinedStream(streams, eventHandler)**
-
-*streams* should be an array of stream names.  You may specify these explicitly, or you can use some helper functions to generate them:
-
-```javascript
-const binanceWS = new api.BinanceWS();
-const streams = binanceWS.streams;
-
-binanceWS.onCombinedStream(
-    [
-        streams.depth('BNBBTC'),
-        streams.depthLevel('BNBBTC', 5),
-        streams.kline('BNBBTC', '5m'),
-        streams.aggTrade('BNBBTC'),
-        streams.trade('BNBBTC'),
-        streams.ticker('BNBBTC'),
-        streams.allTickers()
-    ],
-    (streamEvent) => {
-        switch(streamEvent.stream) {
-            case streams.depth('BNBBTC'):
-                console.log('Depth Event', streamEvent.data);
-                break;
-            case streams.depthLevel('BNBBTC', 5):
-                console.log('Depth Level Event', streamEvent.data);
-                break;
-            case streams.kline('BNBBTC', '5m'):
-                console.log('Kline Event', streamEvent.data);
-                break;
-            case streams.aggTrade('BNBBTC'):
-                console.log('AggTrade Event', streamEvent.data);
-                break;
-            case streams.trade('BNBBTC'):
-                console.log('Trade Event', streamEvent.data);
-                break;
-            case streams.ticker('BNBBTC'):
-                console.log('BNBBTC Ticker Event', streamEvent.data);
-                break;
-            case streams.allTickers():
-                console.log('Ticker Event', streamEvent.data);
-                break;
-        }
-    }
-);
-```
-
 ### **[onUserData(binanceRest, eventHandler, [interval])](https://github.com/binance-exchange/binance-official-api-docs/blob/master/user-data-stream.md#user-data-streams-for-binance-2017-12-01)**
 
 Will return the websocket via promise, `interval` defaults to 60000(ms), and is the amount of time between calls made to keep the user stream alive. `binanceRest` should be an instance of `BinanceRest` that will be used to get the `listenKey` and keep the stream alive.
